@@ -1,14 +1,7 @@
 package com.materialsoftherift.motr.datagen;
 
 import com.materialsoftherift.motr.MaterialsOfTheRift;
-import com.materialsoftherift.motr.init.MotrBlocks;
-import com.materialsoftherift.motr.init.MotrButtons;
-import com.materialsoftherift.motr.init.MotrFenceAndGate;
-import com.materialsoftherift.motr.init.MotrNoGrav;
-import com.materialsoftherift.motr.init.MotrQuenched;
-import com.materialsoftherift.motr.init.MotrSlabs;
-import com.materialsoftherift.motr.init.MotrStairs;
-import com.materialsoftherift.motr.init.MotrWalls;
+import com.materialsoftherift.motr.init.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
@@ -59,7 +52,8 @@ public class MotrLanguageProvider extends LanguageProvider {
         add("itemGroup." + MaterialsOfTheRift.MODID, "MotR");
 
         addBlock(MotrBlocks.HAY_CARPET, "Hay Carpet");
-
+        addBlock(MotrBlocks.WIND_COLUMN, "Wind Column");
+        addItem(MotrItems.WIND_CHARGE_ITEM, "Wind Charge");
     }
 
     private static @NotNull String getTranslationString(Block block) {

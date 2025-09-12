@@ -1,14 +1,8 @@
 package com.materialsoftherift.motr.datagen;
 
+import com.google.gson.JsonObject;
 import com.materialsoftherift.motr.MaterialsOfTheRift;
-import com.materialsoftherift.motr.init.MotrBlocks;
-import com.materialsoftherift.motr.init.MotrButtons;
-import com.materialsoftherift.motr.init.MotrFenceAndGate;
-import com.materialsoftherift.motr.init.MotrNoGrav;
-import com.materialsoftherift.motr.init.MotrQuenched;
-import com.materialsoftherift.motr.init.MotrSlabs;
-import com.materialsoftherift.motr.init.MotrStairs;
-import com.materialsoftherift.motr.init.MotrWalls;
+import com.materialsoftherift.motr.init.*;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -27,6 +21,7 @@ import net.minecraft.client.renderer.item.CompositeModel;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CoralFanBlock;
@@ -249,6 +244,11 @@ public class MotrModelProvider extends ModelProvider {
             );
         });
 
+        Block windColumn = MotrBlocks.WIND_COLUMN.get();
+        addWithOverlay(windColumn.asItem(), ModelLocationUtils.getModelLocation(Blocks.BARRIER), DOT_TEXTURE, itemModels);
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(windColumn,
+                ModelLocationUtils.getModelLocation(Blocks.BARRIER)));
+        addWithOverlay(MotrItems.WIND_CHARGE_ITEM.get(), ModelLocationUtils.getModelLocation(Items.WIND_CHARGE), DOT_TEXTURE, itemModels);
     }
 
     private void registerNoGravModel(

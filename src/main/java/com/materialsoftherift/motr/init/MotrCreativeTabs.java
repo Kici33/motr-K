@@ -21,9 +21,8 @@ public class MotrCreativeTabs {
                     .icon(() -> new ItemStack(MotrBlocks.MOTR.get()))
                     .displayItems((parameters, output) -> {
                         // Changed to omit 'dev blocks'
-                        MotrItems.BLOCK_ITEMS.forEach(blockItem -> {
-                            output.accept(blockItem.get());
-                        });
+                        MotrItems.BLOCK_ITEMS.forEach(blockItem -> output.accept(blockItem.get()));
+                        output.accept(MotrItems.WIND_CHARGE_ITEM.get());
                     })
                     .build());
 

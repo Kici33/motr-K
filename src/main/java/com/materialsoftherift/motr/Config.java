@@ -27,6 +27,31 @@ public class Config {
             .comment("A list of items to log on common setup.")
             .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), () -> "", Config::validateItemName);
 
+    // Wind Column
+    public static final ModConfigSpec.IntValue WIND_COLUMN_MAX_HEIGHT = BUILDER
+            .comment("The maximum height of a wind column")
+            .defineInRange("windColumnMaxHeight", 32, 1, 256);
+
+    public static final ModConfigSpec.DoubleValue UPDRAFT_ACCELERATION = BUILDER
+            .comment("The acceleration of an updraft")
+            .defineInRange("windColumnUpdraftAcceleration", 0.075, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue UPDRAFT_VELOCITY_CAP = BUILDER
+            .comment("The maximum velocity of an updraft")
+            .defineInRange("windColumnUpdraftVelocityCap", 0.9, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue DOWNDRAFT_ACCELERATION = BUILDER
+            .comment("The acceleration of a downdraft")
+            .defineInRange("windColumnDowndraftAcceleration", -0.09, -10D, 0D);
+
+    public static final ModConfigSpec.DoubleValue DOWNDRAFT_VELOCITY_CAP = BUILDER
+            .comment("The maximum velocity of a downdraft")
+            .defineInRange("windColumnDowndraftVelocityCap", -1, -10D, 0D);
+
+    public static final ModConfigSpec.BooleanValue WIND_COLUMN_FALL_DAMAGE_MITIGATION = BUILDER
+            .comment("Whether being in a wind column mitigates fall damage")
+            .define("windColumnFallDamageMitigation", false);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private static boolean validateItemName(final Object obj) {

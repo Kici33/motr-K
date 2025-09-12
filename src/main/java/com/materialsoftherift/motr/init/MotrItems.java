@@ -1,11 +1,14 @@
 package com.materialsoftherift.motr.init;
 
 import com.materialsoftherift.motr.MaterialsOfTheRift;
+import com.materialsoftherift.motr.item.ColumnChargeItem;
 import com.materialsoftherift.motr.item.QuenchedBlockItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.WindChargeItem;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -41,5 +44,8 @@ public class MotrItems {
         DEV_BLOCK_ITEMS.add(simpleBlockItem);
         return simpleBlockItem;
     }
+
+    public static final DeferredItem<ColumnChargeItem> WIND_CHARGE_ITEM = ITEMS.register("wind_charge",
+            () -> new ColumnChargeItem(new Item.Properties().stacksTo(64).setId(ResourceKey.create(Registries.ITEM,  ResourceLocation.fromNamespaceAndPath(MaterialsOfTheRift.MODID, "wind_charge")))));
 
 }
