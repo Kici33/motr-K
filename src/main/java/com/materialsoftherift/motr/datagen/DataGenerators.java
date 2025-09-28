@@ -18,7 +18,6 @@ public class DataGenerators {
     public static void gatherData(GatherDataEvent.Client event) {
 
         event.createProvider(MotrModelProvider::new);
-
         // Tags
 
         event.createProvider(MotrRecipeProvider.Runner::new);

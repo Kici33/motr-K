@@ -2,7 +2,6 @@ package com.materialsoftherift.motr.init;
 
 import com.materialsoftherift.motr.Config;
 import com.materialsoftherift.motr.MaterialsOfTheRift;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -12,22 +11,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +32,7 @@ public class MotrBlocks {
 
     public static class WindColumnBlock extends Block {
 
-        public static final EnumProperty<Direction> WIND_DIRECTION = BlockStateProperties.FACING;
+        public static final EnumProperty<Direction> WIND_DIRECTION = EnumProperty.create("wind_direction", Direction.class, Direction.UP, Direction.DOWN);
 
         public WindColumnBlock(Properties properties) {
             super(properties);
@@ -97,7 +89,7 @@ public class MotrBlocks {
                     level.addParticle(ParticleTypes.SNOWFLAKE, x, y, z, 0.0D, 0.1D, 0.0D);
                     return;
                 }
-                level.addParticle(ParticleTypes.SNOWFLAKE, x, y, z, 0.0D, -0.1D, 0.0D);
+                level.addParticle(ParticleTypes.SNOWFLAKE , x, y, z, 0.0D, -0.1D, 0.0D);
             }
         }
     }
@@ -107,7 +99,7 @@ public class MotrBlocks {
 
     public static final DeferredBlock<CarpetBlock> HAY_CARPET = registerCarpet("hay_carpet", Blocks.HAY_BLOCK);
 
-    public static final DeferredBlock<WindColumnBlock> WIND_COLUMN = registerBlock("wind_column",
+    public static final DeferredBlock<WindColumnBlock> WIND_COLUMN = registerDevBlock("wind_column",
             () -> new WindColumnBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWDER_SNOW).setId(blockId("wind_column")).strength(0.5f).noCollission().noLootTable()));
 
     public static <T extends Block> DeferredBlock<T> registerBlock(String key, Supplier<T> sup) {

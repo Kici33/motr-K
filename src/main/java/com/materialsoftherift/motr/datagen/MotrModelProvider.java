@@ -18,6 +18,7 @@ import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.CompositeModel;
+import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -245,9 +246,31 @@ public class MotrModelProvider extends ModelProvider {
         });
 
         Block windColumn = MotrBlocks.WIND_COLUMN.get();
-        addWithOverlay(windColumn.asItem(), ModelLocationUtils.getModelLocation(Blocks.BARRIER), DOT_TEXTURE, itemModels);
-        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(windColumn,
-                ModelLocationUtils.getModelLocation(Blocks.BARRIER)));
+        ResourceLocation windUpTexture = MaterialsOfTheRift.id("block/wind_column_up");
+        ResourceLocation windDownTexture = MaterialsOfTheRift.id("block/wind_column_down");
+        ResourceLocation windUpModel = ExtendedModelTemplateBuilder.builder()
+            .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
+            .requiredTextureSlot(TextureSlot.ALL)
+            .renderType("translucent")
+            .build()
+            .create(MaterialsOfTheRift.id("block/wind_column_up"),
+                TextureMapping.cube(windUpTexture),
+                blockModels.modelOutput);
+        ResourceLocation windDownModel = ExtendedModelTemplateBuilder.builder()
+            .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
+            .requiredTextureSlot(TextureSlot.ALL)
+            .renderType("translucent")
+            .build()
+            .create(MaterialsOfTheRift.id("block/wind_column_down"),
+                TextureMapping.cube(windDownTexture),
+                blockModels.modelOutput);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(windColumn)
+            .with(PropertyDispatch.property(MotrBlocks.WindColumnBlock.WIND_DIRECTION)
+                .select(Direction.UP, Variant.variant().with(VariantProperties.MODEL, windUpModel))
+                .select(Direction.DOWN, Variant.variant().with(VariantProperties.MODEL, windDownModel))
+            )
+        );
+        addWithOverlay(windColumn.asItem(), windUpModel, DOT_TEXTURE, itemModels);
         addWithOverlay(MotrItems.WIND_CHARGE_ITEM.get(), ModelLocationUtils.getModelLocation(Items.WIND_CHARGE), DOT_TEXTURE, itemModels);
     }
 
