@@ -1,13 +1,6 @@
 package com.materialsoftherift.motr.datagen;
 
-import com.materialsoftherift.motr.init.MotrBlocks;
-import com.materialsoftherift.motr.init.MotrButtons;
-import com.materialsoftherift.motr.init.MotrFenceAndGate;
-import com.materialsoftherift.motr.init.MotrNoGrav;
-import com.materialsoftherift.motr.init.MotrQuenched;
-import com.materialsoftherift.motr.init.MotrSlabs;
-import com.materialsoftherift.motr.init.MotrStairs;
-import com.materialsoftherift.motr.init.MotrWalls;
+import com.materialsoftherift.motr.init.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -53,6 +46,19 @@ public class MotrBlockLootTableProvider extends BlockLootSubProvider {
                 .forEach(slabInfo -> add(slabInfo.slab().get(), createSilkTouchOnlyTable(slabInfo.slab().get()))
                 );
 
+        MotrUnbound.UNBOUND_WHEAT_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_CARROT_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_POTATO_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_BEETROOT_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_NETHER_WART_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_MELON_STEM_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_PUMPKIN_STEM_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_TORCHFLOWER_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_PITCHER_CROP_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        MotrUnbound.UNBOUND_COCOA_STAGES.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+        dropSelf(MotrUnbound.UNBOUND_BAMBOO_SAPLING.get());
+        MotrUnbound.SIMPLE_UNBOUND_BLOCKS.values().forEach(blockInfo -> dropSelf(blockInfo.block().get()));
+
         // glass slab drops broken, need to somehow combine createSlabItemTable and createSilkTouchOnlyTable
 
         MotrWalls.REGISTERED_GLASS_WALLS.values()
@@ -79,9 +85,21 @@ public class MotrBlockLootTableProvider extends BlockLootSubProvider {
                 MotrWalls.REGISTERED_STANDARD_WALLS.values().stream().map(i -> (Block) i.wall().get()),
                 MotrWalls.REGISTERED_GLASS_WALLS.values().stream().map(i -> (Block) i.wall().get()),
                 MotrFenceAndGate.REGISTERED_FENCES.values().stream().map(i -> (Block) i.fence().get()),
+                Stream.of(MotrUnbound.UNBOUND_BAMBOO_SAPLING.get()),
+                MotrUnbound.SIMPLE_UNBOUND_BLOCKS.values().stream().map(i -> i.block().get()),
                 MotrFenceAndGate.REGISTERED_FENCE_GATES.values().stream().map(i -> (Block) i.fenceGate().get()),
                 MotrStairs.REGISTERED_STANDARD_STAIRS.values().stream().map(i -> (Block) i.stair().get()),
-                MotrButtons.REGISTERED_BUTTONS.values().stream().map(info -> (Block) info.button().get())
+                MotrButtons.REGISTERED_BUTTONS.values().stream().map(info -> (Block) info.button().get()),
+                MotrUnbound.UNBOUND_WHEAT_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_CARROT_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_POTATO_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_BEETROOT_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_NETHER_WART_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_MELON_STEM_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_PUMPKIN_STEM_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_TORCHFLOWER_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_PITCHER_CROP_STAGES.values().stream().map(info -> info.block().get()),
+                MotrUnbound.UNBOUND_COCOA_STAGES.values().stream().map(info -> info.block().get())
         ).flatMap(s -> s);
 
         return all::iterator;

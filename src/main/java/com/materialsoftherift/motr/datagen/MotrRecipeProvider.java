@@ -1,15 +1,9 @@
 package com.materialsoftherift.motr.datagen;
 
-import com.materialsoftherift.motr.init.MotrBlocks;
-import com.materialsoftherift.motr.init.MotrButtons;
-import com.materialsoftherift.motr.init.MotrFenceAndGate;
-import com.materialsoftherift.motr.init.MotrNoGrav;
-import com.materialsoftherift.motr.init.MotrQuenched;
-import com.materialsoftherift.motr.init.MotrSlabs;
-import com.materialsoftherift.motr.init.MotrStairs;
-import com.materialsoftherift.motr.init.MotrWalls;
+import com.materialsoftherift.motr.init.*;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -22,6 +16,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /* Handles Data Generation for Recipes of the Wotr mod */
@@ -194,6 +189,43 @@ public class MotrRecipeProvider extends RecipeProvider {
             }
         });
 
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_WHEAT_STAGES, "wheat", Items.WHEAT_SEEDS, Items.WHEAT);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_CARROT_STAGES, "carrot", Items.CARROT, Items.CARROT);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_POTATO_STAGES, "potato", Items.POTATO, Items.POTATO);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_BEETROOT_STAGES, "beetroot", Items.BEETROOT_SEEDS, Items.BEETROOT);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_NETHER_WART_STAGES, "nether_wart", Items.NETHER_WART, Items.NETHER_WART);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_MELON_STEM_STAGES, "melon_stem", Items.MELON_SEEDS, Items.MELON_SEEDS);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_PUMPKIN_STEM_STAGES, "pumpkin_stem", Items.PUMPKIN_SEEDS, Items.PUMPKIN_SEEDS);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_TORCHFLOWER_STAGES, "torchflower", Items.TORCHFLOWER_SEEDS, Items.TORCHFLOWER);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_PITCHER_CROP_STAGES, "pitcher_crop", Items.PITCHER_POD, Items.PITCHER_PLANT);
+        buildUnboundCropRecipes(getter, MotrUnbound.UNBOUND_COCOA_STAGES, "cocoa", Items.COCOA_BEANS, Items.COCOA_BEANS);
+
+        MotrUnbound.SIMPLE_UNBOUND_BLOCKS.forEach((name, info) -> {
+            buildSimpleUnboundRecipes(getter, info, name);
+        });
+
+        // Bamboo Recipes
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, MotrUnbound.UNBOUND_BAMBOO_SAPLING.get())
+                .requires(Items.BAMBOO)
+                .requires(Items.HANGING_ROOTS)
+                .unlockedBy("has_bamboo", has(Items.BAMBOO))
+                .save(this.output, "unbound_bamboo_sapling_from_hanging_roots");
+
+        ShapedRecipeBuilder.shaped(getter, RecipeCategory.MISC, MotrUnbound.UNBOUND_BAMBOO_SAPLING.get(), 8)
+                .pattern("###")
+                .pattern("#R#")
+                .pattern("###")
+                .define('#', Items.BAMBOO)
+                .define('R', Items.ROOTED_DIRT)
+                .unlockedBy("has_bamboo", has(Items.BAMBOO))
+                .save(this.output, "unbound_bamboo_sapling_from_rooted_dirt");
+
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, Items.BAMBOO)
+                .requires(MotrUnbound.UNBOUND_BAMBOO_SAPLING.get())
+                .unlockedBy("has_unbound_bamboo_sapling", has(MotrUnbound.UNBOUND_BAMBOO_SAPLING.get()))
+                .save(this.output, "bamboo_from_unbound_sapling");
+
+        // Carpet
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.BUILDING_BLOCKS, MotrBlocks.HAY_CARPET.get(), 4)
                 .pattern("GG")
                 .define('G', Items.HAY_BLOCK)
@@ -202,9 +234,73 @@ public class MotrRecipeProvider extends RecipeProvider {
 
     }
 
-    // The runner to add to the data generator
+    private void buildSimpleUnboundRecipes(HolderGetter<Item> getter, MotrUnbound.UnboundSimpleBlockInfo info, String name) {
+        ItemLike baseItem = info.baseItem().get();
+        ItemLike unboundItem = info.block().get();
+
+        // Shapeless Crafting
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, unboundItem)
+                .requires(baseItem)
+                .requires(Items.HANGING_ROOTS)
+                .unlockedBy("has_" + name, has(baseItem))
+                .save(this.output, "unbound_" + name + "_from_hanging_roots");
+
+        // Shaped Crafting
+        ShapedRecipeBuilder.shaped(getter, RecipeCategory.MISC, unboundItem, 8)
+                .pattern("###")
+                .pattern("#R#")
+                .pattern("###")
+                .define('#', baseItem)
+                .define('R', Items.ROOTED_DIRT)
+                .unlockedBy("has_" + name, has(baseItem))
+                .save(this.output, "unbound_" + name + "_from_rooted_dirt");
+
+        // Reversion
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, baseItem)
+                .requires(unboundItem)
+                .unlockedBy("has_unbound_" + name, has(unboundItem))
+                .save(this.output, name + "_from_unbound");
+    }
+
+    private void buildUnboundCropRecipes(HolderGetter<Item> getter, Map<Integer, MotrUnbound.UnboundBlockInfo> stages, String cropName, Item seedItem, Item finalDrop) {
+        MotrUnbound.UnboundBlockInfo stage0Info = stages.get(0);
+
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, stage0Info.block().get())
+                .requires(seedItem)
+                .requires(Items.HANGING_ROOTS)
+                .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(seedItem).getPath(), has(seedItem))
+                .save(this.output, "unbound_" + cropName + "_stage0_from_hanging_roots");
+
+        ShapedRecipeBuilder.shaped(getter, RecipeCategory.MISC, stage0Info.block().get(), 8)
+                .pattern("###")
+                .pattern("#R#")
+                .pattern("###")
+                .define('#', seedItem)
+                .define('R', Items.ROOTED_DIRT)
+                .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(seedItem).getPath(), has(seedItem))
+                .save(this.output, "unbound_" + cropName + "_stage0_from_rooted_dirt");
+
+        for (int i = 0; i < stages.size(); i++) {
+            MotrUnbound.UnboundBlockInfo currentStageInfo = stages.get(i);
+
+            if (i < stages.size() - 1) {
+                MotrUnbound.UnboundBlockInfo nextStageInfo = stages.get(i + 1);
+                ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, nextStageInfo.block().get())
+                        .requires(currentStageInfo.block().get())
+                        .requires(Items.HANGING_ROOTS)
+                        .unlockedBy("has_unbound_" + cropName + "_stage" + i, has(currentStageInfo.block().get()))
+                        .save(this.output, "unbound_" + cropName + "_stage" + (i + 1) + "_from_stage" + i);
+            }
+
+            ItemLike revertTo = (i == stages.size() - 1) ? finalDrop : seedItem;
+            ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, revertTo)
+                    .requires(currentStageInfo.block().get())
+                    .unlockedBy("has_unbound_" + cropName + "_stage" + i, has(currentStageInfo.block().get()))
+                    .save(this.output, cropName + "_from_unbound_stage" + i);
+        }
+    }
+
     public static class Runner extends RecipeProvider.Runner {
-        // Get the parameters from the `GatherDataEvent`s.
         public Runner(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
             super(output, lookupProvider);
         }

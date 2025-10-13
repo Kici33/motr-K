@@ -44,6 +44,7 @@ public class MaterialsOfTheRift {
         MotrStairs.BLOCKS.register(modEventBus);
         MotrWalls.BLOCKS.register(modEventBus);
         MotrButtons.BLOCKS.register(modEventBus);
+        MotrUnbound.BLOCKS.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

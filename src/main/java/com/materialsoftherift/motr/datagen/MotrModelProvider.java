@@ -1,15 +1,12 @@
 package com.materialsoftherift.motr.datagen;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.materialsoftherift.motr.MaterialsOfTheRift;
 import com.materialsoftherift.motr.init.*;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
-import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.blockstates.Variant;
-import net.minecraft.client.data.models.blockstates.VariantProperties;
+import net.minecraft.client.data.models.blockstates.*;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
@@ -23,19 +20,14 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CoralFanBlock;
-import net.minecraft.world.level.block.KelpBlock;
-import net.minecraft.world.level.block.KelpPlantBlock;
-import net.minecraft.world.level.block.SeaPickleBlock;
-import net.minecraft.world.level.block.SeagrassBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -245,33 +237,120 @@ public class MotrModelProvider extends ModelProvider {
             );
         });
 
+        generateUnboundCropModels(blockModels, itemModels, "wheat", MotrUnbound.UNBOUND_WHEAT_STAGES, 8);
+        generateUnboundCropModels(blockModels, itemModels, "carrots", MotrUnbound.UNBOUND_CARROT_STAGES, 4);
+        generateUnboundCropModels(blockModels, itemModels, "potatoes", MotrUnbound.UNBOUND_POTATO_STAGES, 4);
+        generateUnboundCropModels(blockModels, itemModels, "beetroots", MotrUnbound.UNBOUND_BEETROOT_STAGES, 4);
+        generateUnboundCropModels(blockModels, itemModels, "nether_wart", MotrUnbound.UNBOUND_NETHER_WART_STAGES, 3);
+        generateUnboundCropModels(blockModels, itemModels, "melon_stem", MotrUnbound.UNBOUND_MELON_STEM_STAGES, 8);
+        generateUnboundCropModels(blockModels, itemModels, "pumpkin_stem", MotrUnbound.UNBOUND_PUMPKIN_STEM_STAGES, 8);
+        generateUnboundCropModels(blockModels, itemModels, "torchflower_crop", MotrUnbound.UNBOUND_TORCHFLOWER_STAGES, 2);
+        generateUnboundCropModels(blockModels, itemModels, "pitcher_crop", MotrUnbound.UNBOUND_PITCHER_CROP_STAGES, 5);
+        generateUnboundCocoaModels(blockModels, itemModels, MotrUnbound.UNBOUND_COCOA_STAGES);
+
+        generateSimpleUnboundModels(blockModels, itemModels);
+        // Bamboo Model
+        Block sapling = MotrUnbound.UNBOUND_BAMBOO_SAPLING.get();
+        ResourceLocation saplingModel = ModelLocationUtils.getModelLocation(Blocks.BAMBOO_SAPLING);
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(sapling, saplingModel));
+        addWithOverlay(sapling.asItem(), saplingModel, DOT_TEXTURE, itemModels);
+
+        // Wind Column
         Block windColumn = MotrBlocks.WIND_COLUMN.get();
         ResourceLocation windUpTexture = MaterialsOfTheRift.id("block/wind_column_up");
         ResourceLocation windDownTexture = MaterialsOfTheRift.id("block/wind_column_down");
         ResourceLocation windUpModel = ExtendedModelTemplateBuilder.builder()
-            .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
-            .requiredTextureSlot(TextureSlot.ALL)
-            .renderType("translucent")
-            .build()
-            .create(MaterialsOfTheRift.id("block/wind_column_up"),
-                TextureMapping.cube(windUpTexture),
-                blockModels.modelOutput);
+                .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
+                .requiredTextureSlot(TextureSlot.ALL)
+                .renderType("translucent")
+                .build()
+                .create(MaterialsOfTheRift.id("block/wind_column_up"),
+                        TextureMapping.cube(windUpTexture),
+                        blockModels.modelOutput);
         ResourceLocation windDownModel = ExtendedModelTemplateBuilder.builder()
-            .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
-            .requiredTextureSlot(TextureSlot.ALL)
-            .renderType("translucent")
-            .build()
-            .create(MaterialsOfTheRift.id("block/wind_column_down"),
-                TextureMapping.cube(windDownTexture),
-                blockModels.modelOutput);
+                .parent(ResourceLocation.withDefaultNamespace("block/cube_all"))
+                .requiredTextureSlot(TextureSlot.ALL)
+                .renderType("translucent")
+                .build()
+                .create(MaterialsOfTheRift.id("block/wind_column_down"),
+                        TextureMapping.cube(windDownTexture),
+                        blockModels.modelOutput);
         blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(windColumn)
-            .with(PropertyDispatch.property(MotrBlocks.WindColumnBlock.WIND_DIRECTION)
-                .select(Direction.UP, Variant.variant().with(VariantProperties.MODEL, windUpModel))
-                .select(Direction.DOWN, Variant.variant().with(VariantProperties.MODEL, windDownModel))
-            )
+                .with(PropertyDispatch.property(MotrBlocks.WindColumnBlock.WIND_DIRECTION)
+                        .select(Direction.UP, Variant.variant().with(VariantProperties.MODEL, windUpModel))
+                        .select(Direction.DOWN, Variant.variant().with(VariantProperties.MODEL, windDownModel))
+                )
         );
         addWithOverlay(windColumn.asItem(), windUpModel, DOT_TEXTURE, itemModels);
         addWithOverlay(MotrItems.WIND_CHARGE_ITEM.get(), ModelLocationUtils.getModelLocation(Items.WIND_CHARGE), DOT_TEXTURE, itemModels);
+    }
+
+    private void generateSimpleUnboundModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+        // Cactus
+        Block cactus = MotrUnbound.UNBOUND_CACTUS.block().get();
+        ResourceLocation cactusModel = ResourceLocation.withDefaultNamespace("block/cactus");
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(cactus, cactusModel));
+        addWithOverlay(cactus.asItem(), cactusModel, DOT_TEXTURE, itemModels);
+
+        // Sugar Cane
+        Block sugarCane = MotrUnbound.UNBOUND_SUGAR_CANE.block().get();
+        ResourceLocation sugarCaneModel = ResourceLocation.withDefaultNamespace("block/sugar_cane");
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(sugarCane, sugarCaneModel));
+        addWithOverlay(sugarCane.asItem(), sugarCaneModel, DOT_TEXTURE, itemModels);
+
+        // Lily Pad
+        Block lilyPad = MotrUnbound.UNBOUND_LILY_PAD.block().get();
+        ResourceLocation lilyPadModel = ResourceLocation.withDefaultNamespace("block/lily_pad");
+        ResourceLocation lilyPadItemModel = ModelTemplates.FLAT_ITEM.create(lilyPad.asItem(), TextureMapping.layer0(lilyPadModel), itemModels.modelOutput);
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(lilyPad, lilyPadModel));
+        addWithOverlay(lilyPad.asItem(), lilyPadItemModel, DOT_TEXTURE, itemModels);
+
+        // Vine
+        Block vine = MotrUnbound.UNBOUND_VINE.block().get();
+        ResourceLocation vineModel = ResourceLocation.withDefaultNamespace("block/vine");
+        blockModels.blockStateOutput.accept(
+                MultiPartGenerator.multiPart(vine)
+                        .with(Condition.condition().term(VineBlock.UP, true), Variant.variant().with(VariantProperties.MODEL, vineModel))
+                        .with(Condition.condition().term(VineBlock.NORTH, true), Variant.variant().with(VariantProperties.MODEL, vineModel))
+                        .with(Condition.condition().term(VineBlock.EAST, true), Variant.variant().with(VariantProperties.MODEL, vineModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(VineBlock.SOUTH, true), Variant.variant().with(VariantProperties.MODEL, vineModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .with(Condition.condition().term(VineBlock.WEST, true), Variant.variant().with(VariantProperties.MODEL, vineModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+        );
+
+        addWithOverlay(vine.asItem(), vineModel, DOT_TEXTURE, itemModels);
+    }
+
+    private void generateUnboundCropModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels, String cropName, Map<Integer, MotrUnbound.UnboundBlockInfo> stages, int maxStage) {
+        for (int i = 0; i < maxStage; i++) {
+            Block unboundBlock = stages.get(i).block().get();
+            ResourceLocation model;
+            if(cropName.equals("pitcher_crop")) {
+                model = ResourceLocation.withDefaultNamespace("block/" + cropName + "_bottom_stage_" + i);
+            } else {
+                model = ResourceLocation.withDefaultNamespace("block/" + cropName + "_stage" + i);
+            }
+
+            blockModels.blockStateOutput.accept(
+                    BlockModelGenerators.createSimpleBlock(unboundBlock, model)
+            );
+            addWithOverlay(unboundBlock.asItem(), model, DOT_TEXTURE, itemModels);
+        }
+    }
+
+    private void generateUnboundCocoaModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels, Map<Integer, MotrUnbound.UnboundBlockInfo> stages) {
+        for (int i = 0; i < 3; i++) {
+            Block unboundBlock = stages.get(i).block().get();
+            ResourceLocation model = ResourceLocation.withDefaultNamespace("block/cocoa_stage" + i);
+
+            PropertyDispatch dispatch = PropertyDispatch.property(BlockStateProperties.HORIZONTAL_FACING)
+                    .select(Direction.SOUTH, Variant.variant().with(VariantProperties.MODEL, model))
+                    .select(Direction.WEST, Variant.variant().with(VariantProperties.MODEL, model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                    .select(Direction.NORTH, Variant.variant().with(VariantProperties.MODEL, model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                    .select(Direction.EAST, Variant.variant().with(VariantProperties.MODEL, model).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270));
+
+            blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(unboundBlock).with(dispatch));
+            addWithOverlay(unboundBlock.asItem(), model, DOT_TEXTURE, itemModels);
+        }
     }
 
     private void registerNoGravModel(
@@ -324,7 +403,7 @@ public class MotrModelProvider extends ModelProvider {
 
         itemModels.modelOutput.accept(
                 overlayTex.withSuffix("_overlay"),
-                () -> com.google.gson.JsonParser.parseString(overlayGuiOnlyJson).getAsJsonObject()
+                () -> JsonParser.parseString(overlayGuiOnlyJson).getAsJsonObject()
         );
 
     }
@@ -334,15 +413,14 @@ public class MotrModelProvider extends ModelProvider {
             ResourceLocation baseModel,
             ResourceLocation overlay,
             ItemModelGenerators itemModels) {
-        itemModels.itemModelOutput.accept(
-                item, new CompositeModel.Unbaked(
-                        java.util.List.of(
-                                new BlockModelWrapper.Unbaked(overlay.withSuffix("_overlay"),
-                                        java.util.Collections.emptyList()),
+            itemModels.itemModelOutput.accept(
+                    item, new CompositeModel.Unbaked(
+                           List.of(
+                                new BlockModelWrapper.Unbaked(overlay.withSuffix("_overlay"), Collections.emptyList()),
                                 new BlockModelWrapper.Unbaked(baseModel, java.util.Collections.emptyList())
-                        )
-                )
-        );
+                           )
+                    )
+            );
     }
 
     private void registerStandardSlabModel(BlockModelGenerators blockModels, Block slab, String textureName) {

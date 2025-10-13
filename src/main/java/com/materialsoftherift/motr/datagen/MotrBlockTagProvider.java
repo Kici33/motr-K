@@ -1,14 +1,7 @@
 package com.materialsoftherift.motr.datagen;
 
 import com.materialsoftherift.motr.MaterialsOfTheRift;
-import com.materialsoftherift.motr.init.MotrBlocks;
-import com.materialsoftherift.motr.init.MotrButtons;
-import com.materialsoftherift.motr.init.MotrFenceAndGate;
-import com.materialsoftherift.motr.init.MotrNoGrav;
-import com.materialsoftherift.motr.init.MotrQuenched;
-import com.materialsoftherift.motr.init.MotrSlabs;
-import com.materialsoftherift.motr.init.MotrStairs;
-import com.materialsoftherift.motr.init.MotrWalls;
+import com.materialsoftherift.motr.init.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
@@ -123,7 +116,11 @@ public class MotrBlockTagProvider extends BlockTagsProvider {
                 .add(MotrSlabs.WARPED_WART_BLOCK_SLAB.slab().get())
                 .add(MotrSlabs.PALE_MOSS_BLOCK_SLAB.slab().get())
                 .add(MotrSlabs.MOSS_BLOCK_SLAB.slab().get())
-                .add(MotrSlabs.NETHER_WART_BLOCK_SLAB.slab().get());
+                .add(MotrSlabs.NETHER_WART_BLOCK_SLAB.slab().get())
+                .add(getAllUnboundHoeBlocks());
+
+        tag(BlockTags.MINEABLE_WITH_AXE)
+                .add(getAllUnboundAxeBlocks());
 
         tag(BlockTags.DIRT)
                 .add(MotrSlabs.DIRT_SLAB.slab().get())
@@ -193,6 +190,9 @@ public class MotrBlockTagProvider extends BlockTagsProvider {
         tag(BlockTags.BAMBOO_PLANTABLE_ON)
                 .add(MotrNoGrav.NOGRAV_GRAVEL.block().get());
 
+        tag(BlockTags.CLIMBABLE)
+                .add(MotrUnbound.UNBOUND_VINE.block().get());
+
         // spotless:on
 
     }
@@ -254,6 +254,34 @@ public class MotrBlockTagProvider extends BlockTagsProvider {
                 .stream()
                 .map(stairInfo -> stairInfo.stair().get())
                 .toArray(Block[]::new);
+    }
+
+    private Block[] getAllUnboundHoeBlocks() {
+        return Stream.concat(Stream.of(
+                        MotrUnbound.UNBOUND_WHEAT_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_CARROT_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_POTATO_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_BEETROOT_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_NETHER_WART_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_MELON_STEM_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_PUMPKIN_STEM_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_TORCHFLOWER_STAGES.values().stream(),
+                        MotrUnbound.UNBOUND_PITCHER_CROP_STAGES.values().stream()
+                )
+                .flatMap(s -> s)
+                .map(unboundBlockInfo -> unboundBlockInfo.block().get()),
+                MotrUnbound.SIMPLE_UNBOUND_BLOCKS.values().stream()
+                        .map(unboundSimpleBlockInfo -> unboundSimpleBlockInfo.block().get()))
+                .toArray(Block[]::new);
+    }
+
+    private Block[] getAllUnboundAxeBlocks() {
+        return Stream.concat(
+                MotrUnbound.UNBOUND_COCOA_STAGES.values()
+                        .stream()
+                        .map(unboundBlockInfo -> unboundBlockInfo.block().get()),
+                Stream.of(MotrUnbound.UNBOUND_BAMBOO_SAPLING.get())
+        ).toArray(Block[]::new);
     }
 
 }
